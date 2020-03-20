@@ -9,7 +9,7 @@ module.exports.list = (req, res, next) => {
 };
 
 module.exports.get = (req, res, next) => {
-  const id = req.params.id;
+  const { id } = req.params;
   Plan.findById(id)
     .then(plan => {
       if (plan) {
@@ -22,7 +22,6 @@ module.exports.get = (req, res, next) => {
 };
 
 module.exports.create = (req, res, next) => {
-  console.log(req.body);
   const {
     title,
     host,
@@ -55,4 +54,61 @@ module.exports.create = (req, res, next) => {
         next(new ApiError(error.message, 500));
       }
     });
+};
+
+module.exports.getByCategory = (req, res, next) => {
+  const { category } = req.query;
+  Plan.find({
+    categories: category
+  })
+    .then(plan => {
+      if (plan) {
+        res.status(201).json(plan);
+      } else {
+        next(new ApiError("Plan by category not found", 404));
+      }
+    })
+    .catch(error => {
+      next(error);
+    });
+};
+
+module.exports.edit = (req, res, next) => {
+  const id = req.params.id;
+  Plan.findByIdAndUpdate(
+    id,
+    {
+      $set: req.body
+    },
+    {
+      new: true
+    }
+  )
+    .then(plan => {
+      if (plan) {
+        res.status(201).json(plan);
+      } else {
+        next(new ApiError("The plan to update was not found", 404));
+      }
+    })
+    .catch(error => {
+      if (error instanceof mongoose.Error.ValidationError) {
+        next(new ApiError(error.message));
+      } else {
+        new ApiError(error.message, 500);
+      }
+    });
+};
+
+module.exports.delete = (req, res, next) => {
+  const id = req.params.id;
+  Plan.findByIdAndRemove(id)
+    .then(plan => {
+      if (plan) {
+        res.status(204).json("Plan deleted successfully");
+      } else {
+        next(new ApiError("Plan not found", 404));
+      }
+    })
+    .catch(error => new ApiError(error.message, 500));
 };

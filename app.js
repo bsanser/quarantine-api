@@ -11,7 +11,7 @@ app.get("/", (req, res) => res.send("Hello World!"));
 
 //Middlewares
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
 app.use("/plans", plansRoutes);
