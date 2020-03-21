@@ -1,22 +1,50 @@
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const bodyParser = require("body-parser");
+const passport = require("passport");
+const session = require("express-session");
 
-const plansRoutes = require("./routes/plans.routes");
-const usersRoutes = require("./routes/users.routes");
+const keys = require("./configs/keys");
+
+const plansRoutes = require("./routes/plan.routes");
+const usersRoutes = require("./routes/user.routes");
+const sessionsRoutes = require("./routes/session.routes");
 
 require("./configs/db.config");
+require("./configs/passport.config").setup(passport);
 
 app.get("/", (req, res) => res.send("Hello World!"));
 
 //Middlewares
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  session({
+    secret: keys.cookieSecret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 1000
+    }
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use((req, res, next) => {
+  res.locals.session = req.user;
+  next();
+});
 
 // Routes
 app.use("/plans", plansRoutes);
 app.use("/users", usersRoutes);
+app.use("/sessions", sessionsRoutes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
