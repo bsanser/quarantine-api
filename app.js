@@ -2,25 +2,28 @@ require("dotenv").config();
 
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const session = require("express-session");
-
-const keys = require("./configs/keys");
 
 const plansRoutes = require("./routes/plan.routes");
 const usersRoutes = require("./routes/user.routes");
 const sessionsRoutes = require("./routes/session.routes");
 
+//Configs
+
+const keys = require("./configs/keys");
+const cors = require("./configs/cors.config");
 require("./configs/db.config");
 require("./configs/passport.config").setup(passport);
 
-app.get("/", (req, res) => res.send("Hello World!"));
-
 //Middlewares
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(cors);
 app.use(
   session({
     secret: keys.cookieSecret,
