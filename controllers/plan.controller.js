@@ -1,11 +1,18 @@
 const mongoose = require("mongoose");
 const Plan = require("../models/plan.model");
 const ApiError = require("../models/api-error.model");
+const mql = require("@microlink/mql");
 
 module.exports.list = (req, res, next) => {
   Plan.find()
     .then(plans => res.json(plans))
     .catch(error => next(error));
+};
+
+module.exports.getInfoFromUrl = async (req, res, next) => {
+  const { url } = req.query;
+  const { data } = await mql(url);
+  res.status("201").json(data);
 };
 
 module.exports.get = (req, res, next) => {
@@ -58,12 +65,13 @@ module.exports.create = (req, res, next) => {
 
 module.exports.getByCategory = (req, res, next) => {
   const { category } = req.query;
+
   Plan.find({
     categories: category
   })
     .then(plan => {
       if (plan) {
-        res.status(201).json(plan);
+        res.json(plan);
       } else {
         next(new ApiError("Plan by category not found", 404));
       }
@@ -74,7 +82,7 @@ module.exports.getByCategory = (req, res, next) => {
 };
 
 module.exports.edit = (req, res, next) => {
-  const id = req.params.id;
+  const { id } = req.params;
   Plan.findByIdAndUpdate(
     id,
     {
