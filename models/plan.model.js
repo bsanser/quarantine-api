@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const CATEGORIES_TYPES = require("./categories-types.js");
 const AUDIENCE_TYPES = require("./audience-types");
+const LANGUAGE_FLAGS = require("./language-flags");
 
 const planSchema = new mongoose.Schema(
   {
@@ -24,13 +25,11 @@ const planSchema = new mongoose.Schema(
       type: String,
       required: [true, "The language of the plan is required"]
     },
-    categories: [
-      {
-        type: [String],
-        enum: CATEGORIES_TYPES,
-        required: [true, "The category is required"]
-      }
-    ],
+    category: {
+      type: String,
+      enum: CATEGORIES_TYPES,
+      required: [true, "The category is required"]
+    },
     audience: {
       type: String,
       enum: AUDIENCE_TYPES,
@@ -56,6 +55,10 @@ const planSchema = new mongoose.Schema(
     }
   }
 );
+
+planSchema.virtual("languageFlagUrl").get(function() {
+  return LANGUAGE_FLAGS[this.language];
+});
 
 const Plan = mongoose.model("Plan", planSchema);
 module.exports = Plan;

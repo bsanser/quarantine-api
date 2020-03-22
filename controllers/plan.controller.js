@@ -33,7 +33,7 @@ module.exports.create = (req, res, next) => {
     title,
     host,
     link,
-    categories,
+    category,
     audience,
     date,
     description,
@@ -45,7 +45,7 @@ module.exports.create = (req, res, next) => {
     title,
     host,
     link,
-    categories,
+    category,
     audience,
     date,
     description,
@@ -71,7 +71,7 @@ module.exports.getByCategory = (req, res, next) => {
   const { category } = req.query;
 
   Plan.find({
-    categories: category
+    category: category
   })
     .then(plan => {
       if (plan) {
