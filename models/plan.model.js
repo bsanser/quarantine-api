@@ -16,6 +16,14 @@ const planSchema = new mongoose.Schema(
       type: String,
       required: [true, "The link is required"]
     },
+    imageUrl: {
+      type: String,
+      required: [true, "The url for the image is required"]
+    },
+    language: {
+      type: String,
+      required: [true, "The language of the plan is required"]
+    },
     categories: [
       {
         type: [String],

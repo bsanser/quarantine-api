@@ -36,7 +36,9 @@ module.exports.create = (req, res, next) => {
     categories,
     audience,
     date,
-    description
+    description,
+    imageUrl,
+    language
   } = req.body;
 
   const plan = new Plan({
@@ -46,7 +48,9 @@ module.exports.create = (req, res, next) => {
     categories,
     audience,
     date,
-    description
+    description,
+    imageUrl,
+    language
   });
 
   plan
