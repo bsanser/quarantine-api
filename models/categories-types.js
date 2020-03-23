@@ -1,1 +1,14 @@
-module.exports = ["Wellness", "Education", "Music", "Arts", "Poetry", "Other"];
+module.exports = [
+  "fitness",
+  "wellness",
+  "education",
+  "programming",
+  "interior-design",
+  "music",
+  "arts",
+  "poetry",
+  "cooking",
+  "coaching",
+  "languages",
+  "other"
+];
