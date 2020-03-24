@@ -10,5 +10,8 @@ module.exports = [
   "cooking",
   "coaching",
   "languages",
+  "movies",
+  "tv-shows",
+  "books",
   "other"
 ];

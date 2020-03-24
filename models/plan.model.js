@@ -10,8 +10,7 @@ const planSchema = new mongoose.Schema(
       required: [true, "The title is required"]
     },
     host: {
-      type: String,
-      required: [true, "The host is required"]
+      type: String
     },
     link: {
       type: String,
@@ -32,8 +31,7 @@ const planSchema = new mongoose.Schema(
     },
     audience: {
       type: String,
-      enum: AUDIENCE_TYPES,
-      default: "all"
+      enum: AUDIENCE_TYPES
     },
     date: {
       type: Date,
