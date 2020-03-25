@@ -5,6 +5,7 @@ const planController = require("../controllers/plan.controller");
 router.get("/", planController.list);
 router.get("/category", planController.getByCategory);
 router.get("/url-info", planController.getInfoFromUrl);
+router.get("/language", planController.getByLanguage);
 router.get("/:id", planController.get);
 router.post("/", planController.create);
 router.put("/:id", planController.edit);

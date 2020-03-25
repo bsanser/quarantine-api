@@ -28,6 +28,43 @@ module.exports.get = (req, res, next) => {
     .catch(error => next(error));
 };
 
+
+module.exports.getByCategory = (req, res, next) => {
+  const { category } = req.query;
+
+  Plan.find({
+    category: category
+  })
+    .then(plan => {
+      if (plan) {
+        res.json(plan);
+      } else {
+        next(new ApiError("Plan by category not found", 404));
+      }
+    })
+    .catch(error => {
+      next(error);
+    });
+};
+
+
+module.exports.getByLanguage = (req, res, next) => {
+  const { language } = req.query;
+
+  Plan.find({
+    language: language
+  })
+    .then(plan => {
+      if (plan) {
+        res.json(plan);
+      } else {
+        next(new ApiError("Plan by language not found", 404));
+      }
+    })
+    .catch(error => {
+      next(error);
+    });
+};
 module.exports.create = (req, res, next) => {
   const {
     title,
@@ -64,24 +101,6 @@ module.exports.create = (req, res, next) => {
       } else {
         next(new ApiError(error.message, 500));
       }
-    });
-};
-
-module.exports.getByCategory = (req, res, next) => {
-  const { category } = req.query;
-
-  Plan.find({
-    category: category
-  })
-    .then(plan => {
-      if (plan) {
-        res.json(plan);
-      } else {
-        next(new ApiError("Plan by category not found", 404));
-      }
-    })
-    .catch(error => {
-      next(error);
     });
 };
 
