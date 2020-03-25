@@ -3,10 +3,32 @@ const Plan = require("../models/plan.model");
 const ApiError = require("../models/api-error.model");
 const mql = require("@microlink/mql");
 
+const hasAppliedFilter = filters => {
+  return Object.values(filters).some(k => k !== "all");
+};
+
 module.exports.list = (req, res, next) => {
-  Plan.find()
-    .then(plans => res.json(plans))
-    .catch(error => next(error));
+  const filters = req.query;
+  if (!hasAppliedFilter(filters)) {
+    Plan.find()
+      .then(plans => res.json(plans))
+      .catch(error => next(error));
+  } else {
+    const query = Plan.find();
+    const appliedFilters = Object.keys(filters)
+      .filter(key => filters[key] !== "all")
+      .map(key => ({
+        filter: key,
+        value: filters[key]
+      }));
+    for (var i = 0; i < appliedFilters.length; i++) {
+      query.where(appliedFilters[i].filter).equals(appliedFilters[i].value);
+    }
+    query
+      .exec()
+      .then(plans => res.json(plans))
+      .catch(error => next(error));
+  }
 };
 
 module.exports.getInfoFromUrl = async (req, res, next) => {
@@ -28,7 +50,6 @@ module.exports.get = (req, res, next) => {
     .catch(error => next(error));
 };
 
-
 module.exports.getByCategory = (req, res, next) => {
   const { category } = req.query;
 
@@ -46,7 +67,6 @@ module.exports.getByCategory = (req, res, next) => {
       next(error);
     });
 };
-
 
 module.exports.getByLanguage = (req, res, next) => {
   const { language } = req.query;
