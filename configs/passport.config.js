@@ -1,5 +1,4 @@
 const User = require("../models/user.model");
-const LocalStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const keys = require("./keys");
 
@@ -17,39 +16,12 @@ module.exports.setup = passport => {
   });
 
   passport.use(
-    "local-auth",
-    new LocalStrategy(
-      {
-        usernameField: "email",
-        passwordField: "password"
-      },
-      (email, password, next) => {
-        User.findOne({ email: email })
-          .then(user => {
-            if (user) {
-              return user.checkPassword(password).then(match => {
-                if (match) {
-                  next(null, user);
-                } else {
-                  next(null, null, { password: "Invalid email or password" });
-                }
-              });
-            } else {
-              next(null, null, { password: "Invalid email or password" });
-            }
-          })
-          .catch(error => next(error));
-      }
-    )
-  );
-
-  passport.use(
     new GoogleStrategy(
       {
         clientID: process.env.GOOGLE_AUTH_CLIENT_ID || keys.googleClientID,
         clientSecret:
           process.env.GOOGLE_AUTH_CLIENT_SECRET || keys.googleClientSecret,
-        callbackURL: process.env.GOOGLE_AUTH_CB || "/auth/google/cb"
+        callbackURL: process.env.GOOGLE_AUTH_CB || "/auth/google/callback"
       },
       authenticateOAuthUser
     )
