@@ -22,6 +22,9 @@ module.exports.list = (req, res, next) => {
         value: filters[key]
       }));
     for (var i = 0; i < appliedFilters.length; i++) {
+      if (appliedFilters[i].filter === "date") {
+        query.where(appliedFilters[i].filter).gt(appliedFilters[i].value);
+      }
       query.where(appliedFilters[i].filter).equals(appliedFilters[i].value);
     }
     query
