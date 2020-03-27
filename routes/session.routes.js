@@ -4,6 +4,10 @@ const sessionController = require("../controllers/session.controller");
 const secureMiddleware = require("../middlewares/secure.middleware");
 const passport = require("passport");
 
+router.get("/api/current_user", function(req, res) {
+  res.send(req.session);
+});
+
 router.get("/auth/google/callback", sessionController.loginWithGoogle);
 router.get(
   "/auth/google",

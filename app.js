@@ -3,14 +3,18 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3001;
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const passport = require("passport");
-const session = require("express-session");
 
+// Routes
 const plansRoutes = require("./routes/plan.routes");
 const usersRoutes = require("./routes/user.routes");
 const sessionsRoutes = require("./routes/session.routes");
+
+//Authentication
+const passport = require("passport");
+const session = require("express-session");
+const MongoStore = require('connect-mongo')(session);
+const mongoose = require('mongoose');
+
 
 //Configs
 
@@ -22,18 +26,21 @@ require("./configs/passport.config").setup(passport);
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(cors);
 app.use(
   session({
     secret: keys.cookieSecret,
-    resave: false,
+    resave: true,
     saveUninitialized: true,
     cookie: {
       secure: false,
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 1000
-    }
+    },
+    store: new MongoStore({
+      mongooseConnection: mongoose.connection,
+      ttl: 24 * 60 * 60
+    })
   })
 );
 app.use(passport.initialize());
