@@ -4,9 +4,7 @@ const sessionController = require("../controllers/session.controller");
 const secureMiddleware = require("../middlewares/secure.middleware");
 const passport = require("passport");
 
-router.get("/api/current_user", function(req, res) {
-  res.send(req.session);
-});
+router.get("/current_user", sessionController.getCurrentUser);
 
 router.get("/auth/google/callback", sessionController.loginWithGoogle);
 router.get(
@@ -15,7 +13,7 @@ router.get(
     scope: ["openid", "profile", "email"]
   })
 );
-router.post("/sessions", sessionController.login);
+
 router.delete("/sessions", sessionController.logout);
 
 module.exports = router;

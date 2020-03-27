@@ -35,7 +35,7 @@ module.exports.setup = passport => {
           next(null, user);
         } else {
           user = new User({
-            name: profile.displayName,
+            name: profile.displayName.split(" ")[0],
             email: profile.emails[0].value,
             password: Math.random()
               .toString(36)
