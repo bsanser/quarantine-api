@@ -100,37 +100,15 @@ module.exports.like = (req, res, next) => {
   const currentUser = req.user; //._id
   Like.findOne({ plan: planId, user: currentUser._id })
     .then(like => {
-      console.log("entro en la busqueda del like");
       if (like) {
-        console.log("encuentro el like");
         Like.findByIdAndRemove(like._id)
-          .then(like => {
-            console.log("esto es el like", like);
-            User.findById(currentUser._id)
-              .populate("plans")
-              .populate("likes")
-              .then(user =>
-                console.log(
-                  "aqui el user stringified",
-                  JSON.stringify(user, null, "\t")
-                )
-              );
-          })
+          .then(() => res.json({ likes: -1, isLiked: false }))
           .catch(error => next(error));
       } else {
-        console.log("no encuentro el like");
         const like = new Like({ plan: planId, user: currentUser._id });
         like
           .save()
-          .then(
-            User.findByIdAndUpdate(currentUser._id)
-              .populate("likes")
-              .populate("plans")
-              .then(user =>
-                console.log("un like nuevo", JSON.stringify(user, null, "\t"))
-              )
-            // // res.json({ likes: 1 });
-          )
+          .then(() => res.json({ likes: 1, isLiked: true }))
           .catch(next);
       }
     })
@@ -140,8 +118,20 @@ module.exports.like = (req, res, next) => {
 module.exports.getPlanTotalLikes = (req, res, next) => {
   const planId = req.params.id;
   Plan.findById(planId)
+    .populate("likes")
     .then(plan => res.status(200).json(plan.likes.length))
     .catch(err => console.log(err));
+};
+
+module.exports.isLiked = (req, res, next) => {
+  const planId = req.params.id;
+  console.log("plan id:", planId);
+  User.findById(req.user._id)
+    .populate("likes")
+    .then(user => {
+      const filteredArray = user.likes.filter(like => like["plan"] == planId);
+      res.json(filteredArray.length !== 0);
+    });
 };
 
 module.exports.edit = (req, res, next) => {
