@@ -4,7 +4,11 @@ const keys = require("./keys");
 
 mongoose.Promise = Promise;
 mongoose
-  .connect(keys.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(keys.mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  })
   .then(() => {
     console.info(`Connect to db ${DB_NAME}`);
   })

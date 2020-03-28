@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Plan = require("../models/plan.model");
+const Like = require("../models/like.model");
+const User = require("../models/user.model");
 const ApiError = require("../models/api-error.model");
 const mql = require("@microlink/mql");
 
@@ -11,6 +13,8 @@ module.exports.list = (req, res, next) => {
   const filters = req.query;
   if (!hasAppliedFilter(filters)) {
     Plan.find()
+      .populate("user")
+      .populate("likes")
       .then(plans => res.json(plans))
       .catch(error => next(error));
   } else {
@@ -43,6 +47,8 @@ module.exports.getInfoFromUrl = async (req, res, next) => {
 module.exports.get = (req, res, next) => {
   const { id } = req.params;
   Plan.findById(id)
+    .populate("user")
+    .populate("likes")
     .then(plan => {
       if (plan) {
         res.json(plan);
@@ -53,48 +59,11 @@ module.exports.get = (req, res, next) => {
     .catch(error => next(error));
 };
 
-module.exports.getByCategory = (req, res, next) => {
-  const { category } = req.query;
-
-  Plan.find({
-    category: category
-  })
-    .then(plan => {
-      if (plan) {
-        res.json(plan);
-      } else {
-        next(new ApiError("Plan by category not found", 404));
-      }
-    })
-    .catch(error => {
-      next(error);
-    });
-};
-
-module.exports.getByLanguage = (req, res, next) => {
-  const { language } = req.query;
-
-  Plan.find({
-    language: language
-  })
-    .then(plan => {
-      if (plan) {
-        res.json(plan);
-      } else {
-        next(new ApiError("Plan by language not found", 404));
-      }
-    })
-    .catch(error => {
-      next(error);
-    });
-};
 module.exports.create = (req, res, next) => {
   const {
     title,
-    host,
     link,
     category,
-    audience,
     date,
     description,
     imageUrl,
@@ -103,14 +72,13 @@ module.exports.create = (req, res, next) => {
 
   const plan = new Plan({
     title,
-    host,
     link,
     category,
-    audience,
     date,
     description,
     imageUrl,
-    language
+    language,
+    user: req.user
   });
 
   plan
@@ -125,6 +93,55 @@ module.exports.create = (req, res, next) => {
         next(new ApiError(error.message, 500));
       }
     });
+};
+
+module.exports.like = (req, res, next) => {
+  const planId = req.params.id;
+  const currentUser = req.user; //._id
+  Like.findOne({ plan: planId, user: currentUser._id })
+    .then(like => {
+      console.log("entro en la busqueda del like");
+      if (like) {
+        console.log("encuentro el like");
+        Like.findByIdAndRemove(like._id)
+          .then(like => {
+            console.log("esto es el like", like);
+            User.findById(currentUser._id)
+              .populate("plans")
+              .populate("likes")
+              .then(user =>
+                console.log(
+                  "aqui el user stringified",
+                  JSON.stringify(user, null, "\t")
+                )
+              );
+          })
+          .catch(error => next(error));
+      } else {
+        console.log("no encuentro el like");
+        const like = new Like({ plan: planId, user: currentUser._id });
+        like
+          .save()
+          .then(
+            User.findByIdAndUpdate(currentUser._id)
+              .populate("likes")
+              .populate("plans")
+              .then(user =>
+                console.log("un like nuevo", JSON.stringify(user, null, "\t"))
+              )
+            // // res.json({ likes: 1 });
+          )
+          .catch(next);
+      }
+    })
+    .catch(next);
+};
+
+module.exports.getPlanTotalLikes = (req, res, next) => {
+  const planId = req.params.id;
+  Plan.findById(planId)
+    .then(plan => res.status(200).json(plan.likes.length))
+    .catch(err => console.log(err));
 };
 
 module.exports.edit = (req, res, next) => {

@@ -1,10 +1,13 @@
 const mongoose = require("mongoose");
 const CATEGORIES_TYPES = require("./categories-types.js");
-const AUDIENCE_TYPES = require("./audience-types");
-const LANGUAGE_FLAGS = require("./language-flags");
 
 const planSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
     title: {
       type: String,
       required: [true, "The title is required"]
@@ -29,10 +32,6 @@ const planSchema = new mongoose.Schema(
       enum: CATEGORIES_TYPES,
       required: [true, "The category is required"]
     },
-    audience: {
-      type: String,
-      enum: AUDIENCE_TYPES
-    },
     date: {
       type: Date,
       required: [true, "The date is required"]
@@ -44,6 +43,7 @@ const planSchema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: {
+      virtuals: true,
       transform: (doc, ret) => {
         ret.id = doc._id;
         delete ret._id;
@@ -54,8 +54,10 @@ const planSchema = new mongoose.Schema(
   }
 );
 
-planSchema.virtual("languageFlagUrl").get(function() {
-  return LANGUAGE_FLAGS[this.language];
+planSchema.virtual("likes", {
+  ref: "Like",
+  localField: "_id",
+  foreignField: "plan"
 });
 
 const Plan = mongoose.model("Plan", planSchema);

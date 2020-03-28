@@ -40,23 +40,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: [roles.ROLE_ADMIN, roles.ROLE_GUEST],
       default: roles.ROLE_GUEST
-    },
-    followedPlans: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Plan"
-      }
-    ],
-    uploadedPlans: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Plan"
-      }
-    ]
+    }
   },
   {
     timestamps: true,
     toJSON: {
+      virtuals: true,
       transform: (doc, ret) => {
         ret.id = doc._id;
         delete ret._id;
@@ -91,6 +80,19 @@ userSchema.pre("save", function(next) {
 userSchema.methods.checkPassword = function(password) {
   return bcrypt.compare(password, this.password);
 };
+
+userSchema.virtual("plans", {
+  ref: "Plan",
+  localField: "_id",
+  foreignField: "user",
+  justOne: false
+});
+userSchema.virtual("likes", {
+  ref: "Like",
+  localField: "_id",
+  foreignField: "user",
+  justOne: false
+});
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

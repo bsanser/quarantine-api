@@ -21,7 +21,6 @@ module.exports.loginWithGoogle = (req, res, next) => {
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  console.log(req.user);
   res.json(req.user ? req.user : {});
 };
 
