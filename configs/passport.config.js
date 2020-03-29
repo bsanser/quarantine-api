@@ -21,7 +21,7 @@ module.exports.setup = passport => {
         clientID: process.env.GOOGLE_AUTH_CLIENT_ID || keys.googleClientID,
         clientSecret:
           process.env.GOOGLE_AUTH_CLIENT_SECRET || keys.googleClientSecret,
-        callbackURL: "/auth/google/callback",
+        callbackURL: process.env.GOOGLE_CALLBACK_URL || keys.googleCallbackUrl,
         proxy: true
       },
       authenticateOAuthUser

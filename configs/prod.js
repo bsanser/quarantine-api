@@ -5,5 +5,6 @@ module.exports = {
   mongoURI: process.env.MONGO_URI,
   cookieKey: process.env.COOKIE_KEY,
   firstAdminEmail: process.env.FIRST_ADMIN_EMAIL,
-  cookieSecret: process.env.COOKIE_SECRET
+  cookieSecret: process.env.COOKIE_SECRET,
+  googleCallbackUrl: process.env.GOOGLE_CALLBACK_URL
 };
