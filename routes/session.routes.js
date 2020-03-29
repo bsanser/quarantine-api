@@ -4,7 +4,7 @@ const sessionController = require("../controllers/session.controller");
 const secureMiddleware = require("../middlewares/secure.middleware");
 const passport = require("passport");
 
-router.get("/current_user", sessionController.getCurrentUser);
+router.get("/api/current_user", sessionController.getCurrentUser);
 
 router.get("/auth/google/callback", sessionController.loginWithGoogle);
 router.get(
@@ -14,6 +14,6 @@ router.get(
   })
 );
 
-router.delete("/sessions", sessionController.logout);
+router.get("/api/logout", sessionController.logout);
 
 module.exports = router;

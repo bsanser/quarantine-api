@@ -12,21 +12,18 @@ const sessionsRoutes = require("./routes/session.routes");
 //Authentication
 const passport = require("passport");
 const session = require("express-session");
-const MongoStore = require('connect-mongo')(session);
-const mongoose = require('mongoose');
-
+const MongoStore = require("connect-mongo")(session);
+const mongoose = require("mongoose");
 
 //Configs
 
 const keys = require("./configs/keys");
-const cors = require("./configs/cors.config");
 require("./configs/db.config");
 require("./configs/passport.config").setup(passport);
 
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors);
 app.use(
   session({
     secret: keys.cookieSecret,
@@ -52,9 +49,9 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/plans", plansRoutes);
-app.use("/users", usersRoutes);
 app.use(sessionsRoutes);
+app.use("/api/plans", plansRoutes);
+app.use("/api/users", usersRoutes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
