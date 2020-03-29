@@ -13,7 +13,7 @@ module.exports.loginWithGoogle = (req, res, next) => {
         if (error) {
           next(new ApiError(error.message, 500));
         } else {
-          res.redirect("//localhost:3000/home");
+          res.redirect("/home");
         }
       });
     }
