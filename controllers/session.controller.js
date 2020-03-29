@@ -13,7 +13,7 @@ module.exports.loginWithGoogle = (req, res, next) => {
         if (error) {
           next(new ApiError(error.message, 500));
         } else {
-          res.redirect("/home");
+          res.redirect(`${process.env.QUARANTINE_WEB_URL}/home`);
         }
       });
     }
