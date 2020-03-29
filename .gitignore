@@ -1,4 +1,4 @@
-/configs/keys.js
 node_modules/
 .env
 .DS_Store
+/configs/dev.js
