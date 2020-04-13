@@ -32,12 +32,12 @@ app.use(
     cookie: {
       secure: false,
       httpOnly: true,
-      maxAge: 60 * 60 * 24 * 1000
+      maxAge: 60 * 60 * 24 * 1000,
     },
     store: new MongoStore({
       mongooseConnection: mongoose.connection,
-      ttl: 24 * 60 * 60
-    })
+      ttl: 24 * 60 * 60,
+    }),
   })
 );
 app.use(passport.initialize());
