@@ -47,13 +47,34 @@ const fetchFilters = ({ category, language, from, to }) => {
   return filter;
 };
 
-module.exports.listPast = (req, res, next) => {
-  const { category, language } = req.query;
-  const now = new Date();
+//Refactor listAllPlans and ListUpcoming
+
+module.exports.listAllPlans = (req, res, next) => {
+  const { category, language, from } = req.query;
+  const initialDate = new Date(from);
+  const year = initialDate.getFullYear();
+  const month = initialDate.getMonth() + 1;
+  const day = initialDate.getDate();
+  const nextDay = day + 1;
+  const selectedDayStart = new Date(`${year}-${month}-${day}`);
+  const selectedDayEnd = new Date(`${year}-${month}-${nextDay}`);
+  if (!from) {
+    const filters = fetchFilters({
+      category: category,
+      language: language,
+    });
+
+    return Plan.find(filters)
+      .sort({ date: "asc" })
+      .then((plans) => res.json(plans))
+      .catch((error) => next(error));
+  }
+
   const filters = fetchFilters({
     category: category,
     language: language,
-    to: now,
+    from: selectedDayStart || new Date(),
+    to: selectedDayEnd,
   });
 
   Plan.find(filters)
@@ -63,10 +84,10 @@ module.exports.listPast = (req, res, next) => {
 };
 
 module.exports.listUpcoming = (req, res, next) => {
-  const { category, language, from, to } = req.query;
+  const { category, language, from } = req.query;
   const initialDate = new Date(from);
   const year = initialDate.getFullYear();
-  const month = initialDate.getMonth();
+  const month = initialDate.getMonth() + 1;
   const day = initialDate.getDate();
   const nextDay = day + 1;
   const selectedDayStart = new Date(`${year}-${month}-${day}`);
@@ -91,7 +112,7 @@ module.exports.listUpcoming = (req, res, next) => {
     to: selectedDayEnd,
   });
 
-  console.log(filters);
+  console.log(JSON.stringify(filters));
 
   Plan.find(filters)
     .sort({ date: "asc" })
@@ -99,19 +120,29 @@ module.exports.listUpcoming = (req, res, next) => {
     .catch((error) => next(error));
 };
 
-
 module.exports.listCreatedPlans = (req, res, next) => {
   const currentUser = req.user;
   User.findById(currentUser.id)
     .populate("plans")
-    .then((createdPlans) => res.json(createdPlans));
+    .then((user) => res.json(user.plans));
 };
 
 module.exports.listLikedPlans = (req, res, next) => {
   const currentUser = req.user;
+  const likedPlans = [];
+
   User.findById(currentUser.id)
     .populate("likes")
-    .then((likedPlans) => res.json(likedPlans));
+    .then(async (user) => {
+      const likedPlansIds = user.likes.map((like) => like.plan);
+
+      for (let i = 0; i < likedPlansIds.length; i++) {
+        const plan = await Plan.findById(likedPlansIds[i]);
+        likedPlans.push(plan);
+      }
+      res.json(likedPlans);
+    })
+    .catch(err => next(err));
 };
 
 module.exports.getInfoFromUrl = async (req, res, next) => {

@@ -4,7 +4,7 @@ const planController = require("../controllers/plan.controller");
 
 router.get("/", planController.listUpcoming);
 router.get("/upcoming", planController.listUpcoming);
-router.get("/past", planController.listPast);
+router.get("/all", planController.listAllPlans);
 router.get("/liked", planController.listLikedPlans);
 router.get("/created", planController.listCreatedPlans);
 router.get("/url-info", planController.getInfoFromUrl);
