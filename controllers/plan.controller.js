@@ -112,8 +112,6 @@ module.exports.listUpcoming = (req, res, next) => {
     to: selectedDayEnd,
   });
 
-  console.log(JSON.stringify(filters));
-
   Plan.find(filters)
     .sort({ date: "asc" })
     .then((plans) => res.json(plans))
